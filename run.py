@@ -1,6 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 from pprint import pprint
+from simple_term_menu import TerminalMenu
 
 
 SCOPE = [
@@ -18,6 +19,23 @@ SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 # print(ppe)
 
 
+def welcome_initial_input():
+    print(
+        "Hello welcome to PPE Management System \n Which of the following choices are you looking for\n 1: New Equipment Input\n 2: Quarantine An Item\n 3: Repair Equipment Log\n 4: Retire Equipment\n"
+    )
+    options = [
+        "1: New Equipment Input",
+        "2: Quarantine An Item",
+        "3: Repair Equipment Log",
+        "4: Retire Equipment",
+    ]
+    terminal_menu = TerminalMenu(options, title="Choices")
+    choice_index = terminal_menu.show()
+    print(choice_index)
+    if choice_index == 0:
+        import_new()
+
+
 def import_new():
     print(
         "Please give the required information\n Name: \n Type: \n Code: \n Serial: \n Date of first use: \n Date of Manufacture:\n"
@@ -29,9 +47,22 @@ def import_new():
     date_first_use = input("Date of first use dd/mm/yyyy: ")
     date_of_manufacture = input("Date of Manufacture dd/mm/yyy: ")
 
+    row_new_input = [
+        name,
+        type,
+        code,
+        serial,
+        date_first_use,
+        date_first_use,
+        date_of_manufacture,
+    ]
+    print("Updating In-use sheet\n")
+    SHEET.worksheet("in_use").append_row(row_new_input)
+    print("In-use sheet successfully updated")
+
 
 def main():
-    input
+    welcome_initial_input()
 
 
-import_new()
+main()
