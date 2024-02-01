@@ -34,6 +34,12 @@ def welcome_initial_input():
     print(choice_index)
     if choice_index == 0:
         import_new()
+    elif choice_index == 1:
+        quarantine_equipment()
+    elif choice_index == 2:
+        repair_equipment()
+    elif choice_index == 3:
+        retire_equipment()
 
 
 def import_new():
@@ -59,6 +65,18 @@ def import_new():
     print("Updating In-use sheet\n")
     SHEET.worksheet("in_use").append_row(row_new_input)
     print("In-use sheet successfully updated")
+
+
+def quarantine_equipment():
+    print()
+
+
+def repair_equipment():
+    print()
+
+
+def retire_equipment():
+    print()
 
 
 def main():
