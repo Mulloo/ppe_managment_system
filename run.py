@@ -46,12 +46,12 @@ def import_new():
     print(
         "Please give the required information\n Name: \n Type: \n Code: \n Serial: \n Date of first use: \n Date of Manufacture:\n"
     )
-    name = input("Name: ")
-    type = input("Type: ")
-    code = input("Code: ")
-    serial = input("Serial: ")
-    date_first_use = input("Date of first use dd/mm/yyyy: ")
-    date_of_manufacture = input("Date of Manufacture dd/mm/yyy: ")
+    name = input("Name:\n")
+    type = input("Type:\n ")
+    code = input("Code:\n ")
+    serial = input("Serial:\n ")
+    date_first_use = input("Date of first use dd/mm/yyyy:\n")
+    date_of_manufacture = input("Date of Manufacture dd/mm/yyy:\n")
 
     row_new_input = [
         name,
