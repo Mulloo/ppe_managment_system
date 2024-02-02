@@ -52,7 +52,7 @@ def import_new():
     serial = input("Serial:\n ")
     date_first_use = input("Date of first use dd/mm/yyyy:\n")
     date_of_manufacture = input("Date of Manufacture dd/mm/yyy:\n")
-
+    print("Saving Data...")
     row_new_input = [
         name,
         type,
@@ -62,13 +62,33 @@ def import_new():
         date_first_use,
         date_of_manufacture,
     ]
-    print("Updating In-use sheet\n")
+    print("Updating In-use Sheet...\n")
     SHEET.worksheet("in_use").append_row(row_new_input)
-    print("In-use sheet successfully updated")
+    print("In-use sheet successfully updated.")
 
 
 def quarantine_equipment():
-    print()
+    print("Supply the correct values for the quarantined equipment")
+    name = input("Name:\n")
+    type = input("Type:\n ")
+    code = input("Code:\n ")
+    serial = input("Serial:\n ")
+    # date_first_use = input("Date of first use dd/mm/yyyy:\n")        TODO: grab this info from the code given
+    # date_of_manufacture = input("Date of Manufacture dd/mm/yyy:\n") TODO: grab this info from the code given
+    issue = input("What issue's dose this equipment have give plenty of detail: \n")
+    date_of_quarantine = input("Equipment quarantine date \n")
+    print("Saving Data... \n")
+    row_quarantine_input = [
+        name,
+        type,
+        code,
+        serial,
+        issue,
+        date_of_quarantine,
+    ]
+    print("Updating Quarantine Sheet...\n")
+    SHEET.worksheet("quarantine").append_row(row_quarantine_input)
+    print("Quarantine sheet successfully updated.\n")
 
 
 def repair_equipment():
