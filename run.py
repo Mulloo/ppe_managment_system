@@ -43,8 +43,18 @@ def welcome_initial_input():
 
 
 def import_new():
+    """Asks the user for in puts to then adds them to the In_use worksheet"""
+
     print(
-        "Please give the required information\n Name: \n Type: \n Code: \n Serial: \n Date of first use: \n Date of Manufacture:\n"
+        f"""
+Please give the required information
+Name:
+Type:
+Code:
+Serial
+Date of first use:
+Date of Manufacture:
+    """
     )
     name = input("Name:\n")
     type = input("Type:\n ")
@@ -68,27 +78,27 @@ def import_new():
 
 
 def quarantine_equipment():
-    print("Supply the correct values for the quarantined equipment")
-    name = input("Name:\n")
-    type = input("Type:\n ")
-    code = input("Code:\n ")
-    serial = input("Serial:\n ")
-    # date_first_use = input("Date of first use dd/mm/yyyy:\n")        TODO: grab this info from the code given
-    # date_of_manufacture = input("Date of Manufacture dd/mm/yyy:\n") TODO: grab this info from the code given
-    issue = input("What issue's dose this equipment have give plenty of detail: \n")
-    date_of_quarantine = input("Equipment quarantine date \n")
-    print("Saving Data... \n")
-    row_quarantine_input = [
-        name,
-        type,
-        code,
-        serial,
-        issue,
-        date_of_quarantine,
-    ]
-    print("Updating Quarantine Sheet...\n")
-    SHEET.worksheet("quarantine").append_row(row_quarantine_input)
-    print("Quarantine sheet successfully updated.\n")
+    """Gathers the code of quarantined equipment finds the cell and then
+    finds and retrieves the row of information"""
+    quarantine_item_code = input("Equipment unique code: ")
+    print("Finding Equipment...")
+    cell_find = SHEET.worksheet("in_use").find(quarantine_item_code)
+    print(quarantine_item_code)
+    cell_row = (
+        str(cell_find)
+        .replace("Cell", "")
+        .replace("C3", "")
+        .replace("Cell", "")
+        .replace(quarantine_item_code, "")
+        .replace("''", "")
+        .replace("R", "")
+        .replace("<", "")
+        .replace(">", "")
+    )
+    quarantine_item_row = SHEET.worksheet("in_use").row_values(
+        int(cell_row)
+    )  # TODO: Need to add the issue and move this to the quarantine sheet at the bottom
+    issue = input("Please specify the issue with this equipment.")
 
 
 def repair_equipment():
@@ -103,4 +113,6 @@ def main():
     welcome_initial_input()
 
 
-main()
+# if __name__ == "__main__":
+#     main()
+quarantine_equipment()
