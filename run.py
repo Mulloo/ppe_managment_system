@@ -83,7 +83,6 @@ def quarantine_equipment():
     quarantine_item_code = input("Equipment unique code: ")
     print("Finding Equipment...")
     cell_find = SHEET.worksheet("in_use").find(quarantine_item_code)
-    print(quarantine_item_code)
     cell_row = (
         str(cell_find)
         .replace("Cell", "")
@@ -95,10 +94,15 @@ def quarantine_equipment():
         .replace("<", "")
         .replace(">", "")
     )
-    quarantine_item_row = SHEET.worksheet("in_use").row_values(
-        int(cell_row)
-    )  # TODO: Need to add the issue and move this to the quarantine sheet at the bottom
-    issue = input("Please specify the issue with this equipment.")
+    quarantine_item_row = SHEET.worksheet("in_use").row_values(int(cell_row))
+    print(f"Confirm Data => {quarantine_item_row}")
+    date_of_quarantine = input("Quarantined Date:  ")
+    issue = input("Please specify the issue with this equipment:\n")
+    quarantine_item_row.append(issue)
+    quarantine_item_row.append(date_of_quarantine)
+    print(f"adding data and issues please confirm {quarantine_item_row}")
+    SHEET.worksheet("quarantine").append_row(quarantine_item_row)
+    SHEET.worksheet("in_use").delete_rows(int(cell_row))
 
 
 def repair_equipment():
@@ -113,6 +117,5 @@ def main():
     welcome_initial_input()
 
 
-# if __name__ == "__main__":
-#     main()
-quarantine_equipment()
+if __name__ == "__main__":
+    main()
