@@ -100,9 +100,11 @@ def quarantine_equipment():
     issue = input("Please specify the issue with this equipment:\n")
     quarantine_item_row.append(issue)
     quarantine_item_row.append(date_of_quarantine)
-    print(f"adding data and issues please confirm {quarantine_item_row}")
+    print(f"adding date and issues please confirm {quarantine_item_row}")
     SHEET.worksheet("quarantine").append_row(quarantine_item_row)
     SHEET.worksheet("in_use").delete_rows(int(cell_row))
+    print("Moving data to quarantine sheet...")
+    print("Data move to sheet successful")
 
 
 def repair_equipment():
