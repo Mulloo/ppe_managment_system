@@ -2,6 +2,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from pprint import pprint
 from simple_term_menu import TerminalMenu
+from datetime import datetime
 
 
 SCOPE = [
@@ -15,11 +16,9 @@ SCOPE_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPE_CREDS)
 SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 
-# ppe = SHEET.worksheet("in_use").get_all_values()
-# print(ppe)
-
 
 def welcome_initial_input():
+    """Welcomes the user and displays the terminal menu options"""
     print(
         "Hello welcome to PPE Management System \n Which of the following choices are you looking for\n 1: New Equipment Input\n 2: Quarantine An Item\n 3: Repair Equipment Log\n 4: Retire Equipment\n"
     )
@@ -112,7 +111,31 @@ def repair_equipment():
 
 
 def retire_equipment():
-    print()
+    """Gathers the equipment code and moves it to the retired sheet"""
+    print("Equipment can only be retire if it is already placed into quarantine: \n")
+    retired_equipment_code = input(
+        "Please input the code of the equipment you wish to retire: \n"
+    )
+    date_of_destruction = input("Please input the date the equipment was destroyed: \n")
+    cell_find = SHEET.worksheet("quarantine").find(retired_equipment_code)
+    cell_row = (
+        str(cell_find)
+        .replace("Cell", "")
+        .replace("C3", "")
+        .replace("Cell", "")
+        .replace(retired_equipment_code, "")
+        .replace("''", "")
+        .replace("R", "")
+        .replace("<", "")
+        .replace(">", "")
+    )
+    print("Getting equipment data")
+    retired_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
+    print(f"Please confirm the data {retired_equipment_row}")
+    print("Moving equipment to retired")
+    retired_equipment_row.append(date_of_destruction)
+    SHEET.worksheet("retired").append_row(retired_equipment_row)
+    SHEET.worksheet("quarantine").delete_rows(int(cell_row))
 
 
 def main():
