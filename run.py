@@ -1,4 +1,5 @@
 import gspread
+import re
 from google.oauth2.service_account import Credentials
 from pprint import pprint
 from simple_term_menu import TerminalMenu
@@ -20,7 +21,16 @@ SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 def welcome_initial_input():
     """Welcomes the user and displays the terminal menu options"""
     print(
-        "Hello welcome to PPE Management System \n Which of the following choices are you looking for\n 1: New Equipment Input\n 2: Quarantine An Item\n 3: Repair Equipment Log\n 4: Retire Equipment\n"
+        """\
+  _____  _____  ______   __  __                                                   _      _____           _                 
+ |  __ \|  __ \|  ____| |  \/  |                                                 | |    / ____|         | |                
+ | |__) | |__) | |__    | \  / | __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_  | (___  _   _ ___| |_ ___ _ __ ___  
+ |  ___/|  ___/|  __|   | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|  \___ \| | | / __| __/ _ \ '_ ` _ \ 
+ | |    | |    | |____  | |  | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_   ____) | |_| \__ \ ||  __/ | | | | |
+ |_|    |_|    |______| |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__| |_____/ \__, |___/\__\___|_| |_| |_|
+                                                   __/ |                                        __/ |                      
+                                                  |___/                                        |___/                       
+          """
     )
     options = [
         "1: New Equipment Input",
@@ -30,7 +40,6 @@ def welcome_initial_input():
     ]
     terminal_menu = TerminalMenu(options, title="Choices")
     choice_index = terminal_menu.show()
-    print(choice_index)
     if choice_index == 0:
         import_new()
     elif choice_index == 1:
@@ -43,7 +52,6 @@ def welcome_initial_input():
 
 def import_new():
     """Asks the user for in puts to then adds them to the In_use worksheet"""
-
     print(
         f"""
 Please give the required information
@@ -55,19 +63,57 @@ Date of first use:
 Date of Manufacture:
     """
     )
-    name = input("Name:\n")
-    type = input("Type:\n ")
-    code = input("Code:\n ")
-    serial = input("Serial:\n ")
-    date_first_use = input("Date of first use dd/mm/yyyy:\n")
-    date_of_manufacture = input("Date of Manufacture dd/mm/yyy:\n")
+    while True:
+        name = input("Name:\n").strip()
+        if all(x.isalpha() or x.isspace() for x in name) and name:
+            break
+        print("Name entered is invalid, letters and spaces only.")
+    while True:
+        type = input("Type:\n").strip()
+        if all(x.isalpha() or x.isspace() for x in type) and type:
+            break
+        print("Type entered is invalid, letters and spaces only.")
+    while True:
+        code = input("Code:\n").strip()
+        code_pattern = r"^[a-z]+/\d+$"
+        if re.match(code_pattern, code):
+            print("Valid code Format.")
+            break
+    else:
+        print("Code enter is invalid. Please use the format xxx/111")
+    while True:
+        serial = input("Serial:\n ").strip()
+        serial_pattern = r"^\d{5}[A-Z]{2}\d{4}$"
+        if re.match(serial_pattern, serial):
+            print("Valid serial format.")
+            break
+        else:
+            print(
+                "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0001"
+            )
+    parsed_date_first_use = None
+    while parsed_date_first_use is None:
+        date_first_use = input("Date of first use dd/mm/yyyy:\n")
+        try:
+            parsed_date_first_use = datetime.strptime(date_first_use, "%d/%m/%Y")
+            print("Date of first use valid", parsed_date_first_use)
+        except ValueError:
+            print("Invalid date format. Please user the format dd\mm\yyyy.")
+    parsed_date_manufacture = None
+    while parsed_date_manufacture is None:
+        date_of_manufacture = input("Date of manufacture dd/mm/yyyy:\n")
+        try:
+            parsed_date_manufacture = datetime.strptime(date_first_use, "%d/%m/%Y")
+            print("Date of manufacture valid", parsed_date_manufacture)
+        except ValueError:
+            print("Invalid date format. Please user the format dd\mm\yyyy.")
+
     print("Saving Data...")
     row_new_input = [
         name,
         type,
         code,
         serial,
-        date_first_use,
         date_first_use,
         date_of_manufacture,
     ]
