@@ -4,7 +4,6 @@ certifi==2023.11.17
 cryptography==3.4.8
 dbus-python==1.2.18
 distro==1.7.0
-distro-info==1.1+ubuntu0.1
 google-auth==2.27.0
 google-auth-oauthlib==1.2.0
 gspread==5.12.4
