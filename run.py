@@ -1,11 +1,12 @@
-import gspread
 import re
 import time
-from google.oauth2.service_account import Credentials
-from pprint import pprint
-from simple_term_menu import TerminalMenu
 from datetime import datetime
-
+import gspread
+import tabulate
+from google.oauth2.service_account import Credentials
+from simple_term_menu import TerminalMenu
+from colorama import Fore, Back, Style
+from welcome import *
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -19,41 +20,8 @@ GSPREAD_CLIENT = gspread.authorize(SCOPE_CREDS)
 SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 
 
-def welcome_initial_input():
-    """Welcomes the user and displays the terminal menu options"""
-    print(
-        """\
- _____  _____  ______ 
-|  __ \|  __ \|  ____|
-| |__) | |__) | |__   
-|  ___/|  ___/|  __|  
-| |    | |    | |____ 
-|_|    |_|    |______|
- __  __                                              _   
-|  \/  |                                            | |  
-| \  / | __ _ _ __   __ _  __ _ _ __ ___   ___ _ __ | |_ 
-| |\/| |/ _` | '_ \ / _` |/ _` | '_ ` _ \ / _ \ '_ \| __|
-| |  | | (_| | | | | (_| | (_| | | | | | |  __/ | | | |_ 
-|_|  |_|\__,_|_| |_|\__,_|\__, |_| |_| |_|\___|_| |_|\__|
-                           __/ |                         
-  _____           _       |___/      
- / ____|         | |                
-| (___  _   _ ___| |_ ___ _ __ ___  
- \___ \| | | / __| __/ _ \ '_ ` _ \ 
- ____) | |_| \__ \ ||  __/ | | | | |
-|_____/ \__, |___/\__\___|_| |_| |_|
-         __/ |                      
-        |___/                                            
-        """
-    )
-    options = [
-        "1: New Equipment Input",
-        "2: Quarantine An Item",
-        "3: Repair Equipment Log",
-        "4: Retire Equipment",
-        "5: Update Equipment",
-        "6: View Sheet",
-    ]
+def main_menu():
+    """"""
     terminal_menu = TerminalMenu(options, title="Choices")
     choice_index = terminal_menu.show()
     if choice_index == 0:
@@ -96,18 +64,20 @@ Date of Manufacture:
     while True:
         code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
-        if re.match(code_pattern, code):
+        try:
+            re.match(code_pattern, code)
             print("Valid code Format.")
             break
-    else:
-        print("Code enter is invalid. Please use the format xxx/111")
+        except ValueError:
+            print("Code enter is invalid. Please use the format xxx/111")
     while True:
         serial = input("Serial:\n ").strip()
         serial_pattern = r"^\d{5}[A-Z]{2}\d{4}$"
-        if re.match(serial_pattern, serial):
+        try:
+            re.match(serial_pattern, serial)
             print("Valid serial format.")
             break
-        else:
+        except ValueError:
             print(
                 "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0001"
             )
@@ -164,15 +134,36 @@ def quarantine_equipment():
     print(f"adding date and issues please confirm {quarantine_item_row}")
     SHEET.worksheet("quarantine").append_row(quarantine_item_row)
     SHEET.worksheet("in_use").delete_rows(int(cell_row))
-    print("Moving data to quarantine sheet...")
-    print("Data move to sheet successful")
+    print(
+        f"""Moving data to quarantine sheet... 
+            Data move to sheet successful.   """
+    )
 
 
 def repair_equipment():
-    print()
+    print("Caution Item must already be in quarantine for a repair to be made.")
+    while True:
+        repair_item_code = input("Code:\n").strip()
+        code_pattern = r"^[a-z]+/\d+$"
+        if re.match(code_pattern, repair_item_code):
+            print("Valid code Format.")
+            break
+    else:
+        print("Code enter is invalid. Please use the format xxx/111")
+    cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
 
 
 def view_sheet():
+    headers = [
+        "name",
+        "type",
+        "code",
+        "serial",
+        "date_first_use",
+        "date_of_manufacturing",
+        "issue",
+    ]
+    table_data = []
     worksheet_titles = [sheet.title for sheet in SHEET.worksheets()]
     worksheet_titles.append("Back")
     terminal_menu = TerminalMenu(
@@ -182,12 +173,14 @@ def view_sheet():
     if menu_entry_index == len(worksheet_titles) - 1:
         print("Returning to the previous menu...")
         time.sleep(3)
-        view_sheet()
+        main()
     sheet_selected = SHEET.get_worksheet(menu_entry_index)
     all_rows = sheet_selected.get_all_values()
     print(f"\nContents of '{sheet_selected}':\n")
     for row in all_rows:
         print(" | ".join(row))
+        table_data.append(row)
+        print(tabulate(table_data, headers=headers))
 
 
 def update_equipment():
@@ -221,6 +214,7 @@ def retire_equipment():
 
 
 def row_num_finder(cell_find, equipment_code):
+    """Removes all but the row number form cell_find"""
     cell_row = (
         str(cell_find)
         .replace("Cell", "")
@@ -237,6 +231,7 @@ def row_num_finder(cell_find, equipment_code):
 
 def main():
     welcome_initial_input()
+    main_menu()
 
 
 if __name__ == "__main__":
