@@ -2,7 +2,7 @@ import re
 import time
 from datetime import datetime
 import gspread
-import tabulate
+from tabulate import tabulate
 from google.oauth2.service_account import Credentials
 from simple_term_menu import TerminalMenu
 from colorama import Fore, Back, Style
@@ -54,50 +54,78 @@ Date of Manufacture:
     while True:
         name = input("Name:\n").strip()
         if all(x.isalpha() or x.isspace() for x in name) and name:
+            print(Fore.GREEN + "Valid Name Format" + Fore.RESET)
             break
-        print("Name entered is invalid, letters and spaces only.")
+        print(
+            Fore.RED + "Name entered is invalid, letters and spaces only." + Fore.RESET
+        )
     while True:
         type = input("Type:\n").strip()
         if all(x.isalpha() or x.isspace() for x in type) and type:
+            print(Fore.GREEN + "Valid Type" + Fore.RESET)
             break
-        print("Type entered is invalid, letters and spaces only.")
+        print(
+            Fore.RED + "Type entered is invalid, letters and spaces only." + Fore.RESET
+        )
     while True:
         code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         try:
             re.match(code_pattern, code)
-            print("Valid code Format.")
+            print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
         except ValueError:
-            print("Code enter is invalid. Please use the format xxx/111")
+            print(
+                Fore.RED
+                + "Code enter is invalid. Please use the format xxx/111"
+                + Fore.RESET
+            )
     while True:
         serial = input("Serial:\n ").strip()
         serial_pattern = r"^\d{5}[A-Z]{2}\d{4}$"
         try:
             re.match(serial_pattern, serial)
-            print("Valid serial format.")
+            print(Fore.GREEN + "Valid serial format." + Fore.RESET)
             break
         except ValueError:
             print(
-                "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0001"
+                Fore.RED
+                + "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0000"
+                + Fore.RESET
             )
     parsed_date_first_use = None
     while parsed_date_first_use is None:
         date_first_use = input("Date of first use dd/mm/yyyy:\n")
         try:
             parsed_date_first_use = datetime.strptime(date_first_use, "%d/%m/%Y")
-            print("Date of first use valid", parsed_date_first_use)
+            print(
+                Fore.GREEN
+                + f"Date of first use valid {parsed_date_first_use}"
+                + Fore.RESET
+            )
         except ValueError:
-            print("Invalid date format. Please user the format dd\mm\yyyy.")
+            print(
+                Fore.GREEN
+                + "Invalid date format. Please user the format dd\mm\yyyy."
+                + Fore.RESET
+            )
     parsed_date_manufacture = None
     while parsed_date_manufacture is None:
         date_of_manufacture = input("Date of manufacture dd/mm/yyyy:\n")
         try:
             parsed_date_manufacture = datetime.strptime(date_first_use, "%d/%m/%Y")
-            print("Date of manufacture valid", parsed_date_manufacture)
+            print(
+                Fore.GREEN
+                + f"Date of manufacture valid {parsed_date_manufacture}"
+                + Fore.RESET
+            )
         except ValueError:
-            print("Invalid date format. Please user the format dd\mm\yyyy.")
-    print("Saving Data...")
+            print(
+                Fore.RED
+                + "Invalid date format. Please user the format dd\mm\yyyy."
+                + Fore.RESET
+            )
+    print(Fore.YELLOW + "Saving Data..." + Fore.RESET)
     row_new_input = [
         name,
         type,
@@ -106,9 +134,9 @@ Date of Manufacture:
         date_first_use,
         date_of_manufacture,
     ]
-    print("Updating In-use Sheet...\n")
+    print(Fore.YELLOW + "Updating In-use Sheet...\n" + Fore.RESET)
     SHEET.worksheet("in_use").append_row(row_new_input)
-    print("In-use sheet successfully updated.")
+    print(Fore.YELLOW + "In-use sheet successfully updated." + Fore.RESET)
 
 
 def quarantine_equipment():
@@ -177,10 +205,9 @@ def view_sheet():
     sheet_selected = SHEET.get_worksheet(menu_entry_index)
     all_rows = sheet_selected.get_all_values()
     print(f"\nContents of '{sheet_selected}':\n")
-    for row in all_rows:
-        print(" | ".join(row))
+    for row in all_rows[1:]:
         table_data.append(row)
-        print(tabulate(table_data, headers=headers))
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
 
 def update_equipment():
