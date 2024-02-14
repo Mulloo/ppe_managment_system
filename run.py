@@ -105,7 +105,7 @@ Date of Manufacture:
             )
         except ValueError:
             print(
-                Fore.GREEN
+                Fore.RED
                 + "Invalid date format. Please user the format dd\mm\yyyy."
                 + Fore.RESET
             )
@@ -149,22 +149,47 @@ def quarantine_equipment():
             print("Valid code Format.")
             break
     else:
-        print("Code enter is invalid. Please use the format xxx/111")
-    print("Finding Equipment...")
+        print(
+            Fore.RED
+            + "Code enter is invalid. Please use the format xxx/111"
+            + Fore.GREEN
+        )
+    print(Fore.YELLOW + "Finding Equipment..." + Fore.RESET)
     cell_find = SHEET.worksheet("in_use").find(quarantine_item_code)
     cell_row = row_num_finder(cell_find, quarantine_item_code)
     quarantine_item_row = SHEET.worksheet("in_use").row_values(int(cell_row))
-    print(f"Confirm Data => {quarantine_item_row}")
-    date_of_quarantine = input("Quarantined Date:  ")
+    print(Fore.YELLOW + f"Confirm Data => {quarantine_item_row}" + Fore.RESET)
     issue = input("Please specify the issue with this equipment:\n")
+    parsed_date_quarantine = None
+    while parsed_date_quarantine is None:
+        date_quarantine = input("Date of Quarantine dd/mm/yyyy:\n")
+        try:
+            parsed_date_quarantine = datetime.strptime(date_quarantine, "%d/%m/%Y")
+            print(
+                Fore.GREEN
+                + f"Date of quarantine valid {parsed_date_quarantine}"
+                + Fore.RESET
+            )
+        except ValueError:
+            print(
+                Fore.RED
+                + "Invalid date format. Please user the format dd\mm\yyyy."
+                + Fore.RESET
+            )
     quarantine_item_row.append(issue)
-    quarantine_item_row.append(date_of_quarantine)
-    print(f"adding date and issues please confirm {quarantine_item_row}")
+    quarantine_item_row.append(date_quarantine)
+    print(
+        Fore.YELLOW
+        + f"adding date and issues please confirm {quarantine_item_row}"
+        + Fore.RESET
+    )
     SHEET.worksheet("quarantine").append_row(quarantine_item_row)
     SHEET.worksheet("in_use").delete_rows(int(cell_row))
     print(
-        f"""Moving data to quarantine sheet... 
+        Fore.YELLOW
+        + f"""Moving data to quarantine sheet... 
             Data move to sheet successful.   """
+        + Fore.RESET
     )
 
 
@@ -174,10 +199,12 @@ def repair_equipment():
         repair_item_code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, repair_item_code):
-            print("Valid code Format.")
+            print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
     else:
-        print("Code enter is invalid. Please use the format xxx/111")
+        print(
+            Fore.RED + "Code enter is invalid. Please use the format xxx/111" + Fore.RED
+        )
     cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
 
 
@@ -199,7 +226,7 @@ def view_sheet():
     )
     menu_entry_index = terminal_menu.show()
     if menu_entry_index == len(worksheet_titles) - 1:
-        print("Returning to the previous menu...")
+        print(Fore.YELLOW + "Returning to the previous menu..." + Fore.RESET)
         time.sleep(3)
         main()
     sheet_selected = SHEET.get_worksheet(menu_entry_index)
@@ -221,21 +248,36 @@ def retire_equipment():
         retired_equipment_code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, retired_equipment_code):
-            print("Valid code Format.")
+            print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
     else:
-        print("Code enter is invalid. Please use the format xxx/111 (x = [a-z])")
-    retired_equipment_code = input(
-        "Please input the code of the equipment you wish to retire: \n"
-    )
-    date_of_destruction = input("Please input the date the equipment was destroyed: \n")
+        print(
+            Fore.GREEN
+            + "Code enter is invalid. Please use the format xxx/111 (x = [a-z])"
+            + Fore.RESET
+        )
+    while parsed_date_destruction is None:
+        date_destruction = input("Date of destruction dd/mm/yyyy:\n")
+        try:
+            parsed_date_destruction = datetime.strptime(date_destruction, "%d/%m/%Y")
+            print(
+                Fore.GREEN
+                + f"Date of destruction valid {parsed_date_destruction}"
+                + Fore.RESET
+            )
+        except ValueError:
+            print(
+                Fore.RED
+                + "Invalid date format. Please user the format dd\mm\yyyy."
+                + Fore.RESET
+            )
     cell_find = SHEET.worksheet("quarantine").find(retired_equipment_code)
     cell_row = row_num_finder(cell_find, retired_equipment_code)
     print("Getting equipment data")
     retired_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
     print(f"Please confirm the data {retired_equipment_row}")
     print("Moving equipment to retired")
-    retired_equipment_row.append(date_of_destruction)
+    retired_equipment_row.append(parsed_date_destruction)
     SHEET.worksheet("retired").append_row(retired_equipment_row)
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
 
