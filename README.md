@@ -2,5 +2,4 @@
 
 ## Logic template
 
-<iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVN8ulxCg=/?moveToViewport=-68105,5412,44994,29768&embedId=270552040298" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen>
-</iframe>
+<iframe width="768" height="432" src="https://miro.com/app/live-embed/uXjVN8ulxCg=/?moveToViewport=-66950,5643,42962,23070&embedId=72126245062" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
