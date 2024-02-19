@@ -1,5 +1,6 @@
 import re
 import time
+import sys
 from datetime import datetime
 import gspread
 from tabulate import tabulate
@@ -21,7 +22,7 @@ SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 
 
 def main_menu():
-    """"""
+    """Sets the choices for the terminal menu and executes the required function"""
     terminal_menu = TerminalMenu(options, title="Choices")
     choice_index = terminal_menu.show()
     if choice_index == 0:
@@ -51,6 +52,7 @@ Date of first use:
 Date of Manufacture:
     """
     )
+
     while True:
         name = input("Name:\n").strip()
         if all(x.isalpha() or x.isspace() for x in name) and name:
@@ -70,11 +72,10 @@ Date of Manufacture:
     while True:
         code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
-        try:
-            re.match(code_pattern, code)
+        if re.match(code_pattern, code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
-        except ValueError:
+        else:
             print(
                 Fore.RED
                 + "Code enter is invalid. Please use the format xxx/111"
@@ -83,11 +84,10 @@ Date of Manufacture:
     while True:
         serial = input("Serial:\n ").strip()
         serial_pattern = r"^\d{5}[A-Z]{2}\d{4}$"
-        try:
-            re.match(serial_pattern, serial)
+        if re.match(serial_pattern, serial):
             print(Fore.GREEN + "Valid serial format." + Fore.RESET)
             break
-        except ValueError:
+        else:
             print(
                 Fore.RED
                 + "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0000"
@@ -205,7 +205,27 @@ def repair_equipment():
         print(
             Fore.RED + "Code enter is invalid. Please use the format xxx/111" + Fore.RED
         )
+    # Find the cell and send it to row number finder
     cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
+    cell_row = row_num_finder(cell_find, repair_item_code)
+    print("Getting equipment data...")
+    # Find row data
+    repair_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
+    job_completed = input("Please detail the job completed: ")
+    print(repair_equipment_row)
+    print(cell_find)
+    print(cell_row)
+    # add job done to the row
+    repair_equipment_row.append(job_completed)
+    print(repair_equipment_row)
+    print("Logging repair")
+    # add row to repair log sheet
+    SHEET.worksheet("repair").append_row(repair_equipment_row)
+    print("Repair Logged")
+    # add equipment back to in_use sheet
+    SHEET.worksheet("in_use").append_row(repair_equipment_row)
+    # remove equipment form quarantine sheet
+    SHEET.worksheet("quarantine").delete_rows(int(cell_row))
 
 
 def view_sheet():
@@ -218,8 +238,14 @@ def view_sheet():
         "date_of_manufacturing",
         "issue",
     ]
+
+    # set table data to empty array
     table_data = []
+
+    # set worksheet titles form sheet dependent on sheet choice
     worksheet_titles = [sheet.title for sheet in SHEET.worksheets()]
+
+    # add the back option to the titles
     worksheet_titles.append("Back")
     terminal_menu = TerminalMenu(
         worksheet_titles, title="Select the sheet you whish to view:"
@@ -234,7 +260,8 @@ def view_sheet():
     print(f"\nContents of '{sheet_selected}':\n")
     for row in all_rows[1:]:
         table_data.append(row)
-    print(tabulate(table_data, headers=headers, tablefmt="grid"))
+    print(tabulate(table_data, headers=headers, tablefmt="simple"))
+    view_sheet()
 
 
 def update_equipment():
@@ -273,11 +300,11 @@ def retire_equipment():
             )
     cell_find = SHEET.worksheet("quarantine").find(retired_equipment_code)
     cell_row = row_num_finder(cell_find, retired_equipment_code)
-    print("Getting equipment data")
+    print("Getting equipment data...")
     retired_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
     print(f"Please confirm the data {retired_equipment_row}")
     print("Moving equipment to retired")
-    retired_equipment_row.append(parsed_date_destruction)
+    retired_equipment_row.replace("n/a", str(parsed_date_destruction))
     SHEET.worksheet("retired").append_row(retired_equipment_row)
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
 
