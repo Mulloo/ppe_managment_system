@@ -20,6 +20,11 @@ GSPREAD_CLIENT = gspread.authorize(SCOPE_CREDS)
 SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 
 
+def go_to_main_menu():
+    input("Hit enter to go back")
+    main_menu()
+
+
 def main_menu():
     """
     Sets the choices for the terminal menu
@@ -161,6 +166,7 @@ Date of Manufacture:
     # add new equipment to in_use sheet
     SHEET.worksheet("in_use").append_row(row_new_input)
     print(Fore.YELLOW + "In-use sheet successfully updated." + Fore.RESET)
+    go_to_main_menu()
 
 
 def quarantine_equipment():
@@ -176,12 +182,12 @@ def quarantine_equipment():
         if re.match(code_pattern, quarantine_item_code):
             print("Valid code Format.")
             break
-    else:
-        print(
-            Fore.RED
-            + "Code enter is invalid. Please use the format xxx/111"
-            + Fore.GREEN
-        )
+        else:
+            print(
+                Fore.RED
+                + "Code enter is invalid. Please use the format xxx/111"
+                + Fore.GREEN
+            )
     print(Fore.YELLOW + "Finding Equipment..." + Fore.RESET)
 
     # Find the cell and send it to row number finder
@@ -234,11 +240,10 @@ def quarantine_equipment():
     # quarantine row removed from in_use sheet
     SHEET.worksheet("in_use").delete_rows(int(cell_row))
     print(
-        Fore.YELLOW
-        + f"""Moving data to quarantine sheet... 
-            Data move to sheet successful.   """
-        + Fore.RESET
+        f""" {Fore.YELLOW} Moving data to quarantine sheet...
+Data move to sheet successful.  {Fore.RESET} """
     )
+    go_to_main_menu()
 
 
 def repair_equipment():
@@ -259,7 +264,11 @@ def repair_equipment():
         )
 
     # Find the cell and send it to row number finder
-    cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
+    try:
+        cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
+    except:
+        print(Fore.RED + "Item must be quarantined first" + Fore.RESET)
+
     cell_row = row_num_finder(cell_find, repair_item_code)
     print("Getting equipment data...")
 
@@ -351,12 +360,12 @@ def retire_equipment():
         if re.match(code_pattern, retired_equipment_code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
-    else:
-        print(
-            Fore.GREEN
-            + "Code enter is invalid. Please use the format xxx/111 (x = [a-z])"
-            + Fore.RESET
-        )
+        else:
+            print(
+                Fore.GREEN
+                + "Code enter is invalid. Please use the format xxx/111 (x = [a-z])"
+                + Fore.RESET
+            )
 
     # gather date of destruction from user and validate it with datetime
     while parsed_date_destruction is None:
