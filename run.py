@@ -1,6 +1,5 @@
 import re
 import time
-import sys
 from datetime import datetime
 import gspread
 from tabulate import tabulate
