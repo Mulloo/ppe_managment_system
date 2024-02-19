@@ -57,6 +57,8 @@ Date of first use:
 Date of Manufacture:
     """
     )
+
+    # Gather name of equipment and validate it only has letters and spaces
     while True:
         name = input("Name:\n").strip()
         if all(x.isalpha() or x.isspace() for x in name) and name:
@@ -65,6 +67,8 @@ Date of Manufacture:
         print(
             Fore.RED + "Name entered is invalid, letters and spaces only." + Fore.RESET
         )
+
+    # Gather equipment type and insure it only has letters and spaces
     while True:
         type = input("Type:\n").strip()
         if all(x.isalpha() or x.isspace() for x in type) and type:
@@ -73,6 +77,8 @@ Date of Manufacture:
         print(
             Fore.RED + "Type entered is invalid, letters and spaces only." + Fore.RESET
         )
+
+    # Gather code from user validate it using re.match with the pattern given
     while True:
         code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
@@ -85,6 +91,8 @@ Date of Manufacture:
                 + "Code enter is invalid. Please use the format xxx/111"
                 + Fore.RESET
             )
+
+    # Gather serial from user validate it using re.match with the pattern given
     while True:
         serial = input("Serial:\n ").strip()
         serial_pattern = r"^\d{5}[A-Z]{2}\d{4}$"
@@ -97,7 +105,11 @@ Date of Manufacture:
                 + "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0000"
                 + Fore.RESET
             )
+
+    # set date of first use to None
     parsed_date_first_use = None
+
+    # Gather first use from user validate it using datetime
     while parsed_date_first_use is None:
         date_first_use = input("Date of first use dd/mm/yyyy:\n")
         try:
@@ -113,7 +125,11 @@ Date of Manufacture:
                 + "Invalid date format. Please user the format dd\mm\yyyy."
                 + Fore.RESET
             )
+
+    # set date of manufacture use to None
     parsed_date_manufacture = None
+
+    # Gather manufactured date from user validate it using datetime
     while parsed_date_manufacture is None:
         date_of_manufacture = input("Date of manufacture dd/mm/yyyy:\n")
         try:
@@ -130,6 +146,8 @@ Date of Manufacture:
                 + Fore.RESET
             )
     print(Fore.YELLOW + "Saving Data..." + Fore.RESET)
+
+    # set row data using inputs taken from user
     row_new_input = [
         name,
         type,
@@ -139,6 +157,8 @@ Date of Manufacture:
         date_of_manufacture,
     ]
     print(Fore.YELLOW + "Updating In-use Sheet...\n" + Fore.RESET)
+
+    # add new equipment to in_use sheet
     SHEET.worksheet("in_use").append_row(row_new_input)
     print(Fore.YELLOW + "In-use sheet successfully updated." + Fore.RESET)
 
@@ -323,6 +343,8 @@ def retire_equipment():
     from the in_use sheet
     """
     print("Equipment can only be retire if it is already placed into quarantine: \n")
+
+    # gather code form user and validate t user re.match
     while True:
         retired_equipment_code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
@@ -335,6 +357,8 @@ def retire_equipment():
             + "Code enter is invalid. Please use the format xxx/111 (x = [a-z])"
             + Fore.RESET
         )
+
+    # gather date of destruction from user and validate it with datetime
     while parsed_date_destruction is None:
         date_destruction = input("Date of destruction dd/mm/yyyy:\n")
         try:
@@ -350,6 +374,7 @@ def retire_equipment():
                 + "Invalid date format. Please user the format dd\mm\yyyy."
                 + Fore.RESET
             )
+
     # find the code in the quarantine sheet
     cell_find = SHEET.worksheet("quarantine").find(retired_equipment_code)
 
