@@ -22,7 +22,10 @@ SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 
 
 def main_menu():
-    """Sets the choices for the terminal menu and executes the required function"""
+    """
+    Sets the choices for the terminal menu
+    and executes the required function
+    """
     terminal_menu = TerminalMenu(options, title="Choices")
     choice_index = terminal_menu.show()
     if choice_index == 0:
@@ -40,7 +43,10 @@ def main_menu():
 
 
 def import_new():
-    """Asks the user for in puts to then adds them to the In_use worksheet"""
+    """
+    Asks the user for all necessary inputs then adds them to
+    the In_use worksheet
+    """
     print(
         f"""
 Please give the required information
@@ -52,7 +58,6 @@ Date of first use:
 Date of Manufacture:
     """
     )
-
     while True:
         name = input("Name:\n").strip()
         if all(x.isalpha() or x.isspace() for x in name) and name:
@@ -140,8 +145,12 @@ Date of Manufacture:
 
 
 def quarantine_equipment():
-    """Gathers the code of quarantined equipment finds the cell and then
-    finds and retrieves the row of information"""
+    """
+    Gathers the code of quarantined equipment finds the cell and then
+    finds and retrieves the row of information the user inputs the equipments
+    issue and appends it to the row it is then added to the quarantine sheet and
+    removed from the in_use sheet
+    """
     while True:
         quarantine_item_code = input("Code:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
@@ -155,12 +164,24 @@ def quarantine_equipment():
             + Fore.GREEN
         )
     print(Fore.YELLOW + "Finding Equipment..." + Fore.RESET)
+
+    # Find the cell and send it to row number finder
     cell_find = SHEET.worksheet("in_use").find(quarantine_item_code)
     cell_row = row_num_finder(cell_find, quarantine_item_code)
+
+    # Find row data
     quarantine_item_row = SHEET.worksheet("in_use").row_values(int(cell_row))
+
+    # send data found to user to insure correct equipment is returned
     print(Fore.YELLOW + f"Confirm Data => {quarantine_item_row}" + Fore.RESET)
+
+    # gather issue from user to add to row later
     issue = input("Please specify the issue with this equipment:\n")
+
+    # set date to None
     parsed_date_quarantine = None
+
+    # gather date form user validate format using datetime
     while parsed_date_quarantine is None:
         date_quarantine = input("Date of Quarantine dd/mm/yyyy:\n")
         try:
@@ -176,14 +197,22 @@ def quarantine_equipment():
                 + "Invalid date format. Please user the format dd\mm\yyyy."
                 + Fore.RESET
             )
+
+    # append issue
     quarantine_item_row.append(issue)
+
+    # append date
     quarantine_item_row.append(date_quarantine)
     print(
         Fore.YELLOW
         + f"adding date and issues please confirm {quarantine_item_row}"
         + Fore.RESET
     )
+
+    # quarantine row added to quarantine sheet
     SHEET.worksheet("quarantine").append_row(quarantine_item_row)
+
+    # quarantine row removed from in_use sheet
     SHEET.worksheet("in_use").delete_rows(int(cell_row))
     print(
         Fore.YELLOW
@@ -194,6 +223,10 @@ def quarantine_equipment():
 
 
 def repair_equipment():
+    """
+    Gathers the unique code form the user gets the cell then row data takes that
+    data adds the job completed and logs it in the repair sheet
+    """
     print("Caution Item must already be in quarantine for a repair to be made.")
     while True:
         repair_item_code = input("Code:\n").strip()
@@ -205,25 +238,31 @@ def repair_equipment():
         print(
             Fore.RED + "Code enter is invalid. Please use the format xxx/111" + Fore.RED
         )
+
     # Find the cell and send it to row number finder
     cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
     cell_row = row_num_finder(cell_find, repair_item_code)
     print("Getting equipment data...")
+
     # Find row data
     repair_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
     job_completed = input("Please detail the job completed: ")
     print(repair_equipment_row)
     print(cell_find)
     print(cell_row)
+
     # add job done to the row
     repair_equipment_row.append(job_completed)
     print(repair_equipment_row)
     print("Logging repair")
+
     # add row to repair log sheet
     SHEET.worksheet("repair").append_row(repair_equipment_row)
     print("Repair Logged")
+
     # add equipment back to in_use sheet
     SHEET.worksheet("in_use").append_row(repair_equipment_row)
+
     # remove equipment form quarantine sheet
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
 
@@ -250,17 +289,27 @@ def view_sheet():
     terminal_menu = TerminalMenu(
         worksheet_titles, title="Select the sheet you whish to view:"
     )
+
     menu_entry_index = terminal_menu.show()
     if menu_entry_index == len(worksheet_titles) - 1:
         print(Fore.YELLOW + "Returning to the previous menu..." + Fore.RESET)
         time.sleep(3)
         main()
+    # get sheet from user choice
     sheet_selected = SHEET.get_worksheet(menu_entry_index)
+
+    # get all values form sheet chosen
     all_rows = sheet_selected.get_all_values()
     print(f"\nContents of '{sheet_selected}':\n")
+
+    # add each row to all data
     for row in all_rows[1:]:
         table_data.append(row)
+
+    # print table to terminal
     print(tabulate(table_data, headers=headers, tablefmt="simple"))
+
+    # start the function again the user can use the back choice to return to main
     view_sheet()
 
 
@@ -269,7 +318,11 @@ def update_equipment():
 
 
 def retire_equipment():
-    """Gathers the equipment code and moves it to the retired sheet"""
+    """
+    Gathers the equipment code gathers the row data adds the date of
+    destruction and then moves it to the retired sheet the row is then removed
+    from the in_use sheet
+    """
     print("Equipment can only be retire if it is already placed into quarantine: \n")
     while True:
         retired_equipment_code = input("Code:\n").strip()
@@ -298,19 +351,33 @@ def retire_equipment():
                 + "Invalid date format. Please user the format dd\mm\yyyy."
                 + Fore.RESET
             )
+    # find the code in the quarantine sheet
     cell_find = SHEET.worksheet("quarantine").find(retired_equipment_code)
+
+    # find the row number by sending it to the row num finder function
     cell_row = row_num_finder(cell_find, retired_equipment_code)
     print("Getting equipment data...")
+
+    # get all the data form the the row returned from the row number finder
     retired_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
     print(f"Please confirm the data {retired_equipment_row}")
     print("Moving equipment to retired")
+
+    # removes the n/a placeholder with the destruction date
     retired_equipment_row.replace("n/a", str(parsed_date_destruction))
+
+    # adds the new retire row data to the retired sheet
     SHEET.worksheet("retired").append_row(retired_equipment_row)
+
+    # removes the row from quarantine sheet
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
 
 
 def row_num_finder(cell_find, equipment_code):
-    """Removes all but the row number form cell_find"""
+    """
+    Removes all unwanted string characters form cell_find the cell
+    row number is then returned
+    """
     cell_row = (
         str(cell_find)
         .replace("Cell", "")
@@ -326,6 +393,7 @@ def row_num_finder(cell_find, equipment_code):
 
 
 def main():
+    """Starts the welcome function the loads the main menu"""
     welcome_initial_input()
     main_menu()
 
