@@ -22,6 +22,7 @@ SHEET = GSPREAD_CLIENT.open("ppe_management_sheet")
 
 def go_to_main_menu():
     input("Hit enter to go back")
+    welcome_initial_input()
     main_menu()
 
 
@@ -69,9 +70,14 @@ Date of Manufacture:
         if all(x.isalpha() or x.isspace() for x in name) and name:
             print(Fore.GREEN + "Valid Name Format" + Fore.RESET)
             break
-        print(
-            Fore.RED + "Name entered is invalid, letters and spaces only." + Fore.RESET
-        )
+        elif name == "b":
+            go_to_main_menu()
+        else:
+            print(
+                Fore.RED
+                + "Name entered is invalid, letters and spaces only."
+                + Fore.RESET
+            )
 
     # Gather equipment type and insure it only has letters and spaces
     while True:
@@ -79,9 +85,14 @@ Date of Manufacture:
         if all(x.isalpha() or x.isspace() for x in type) and type:
             print(Fore.GREEN + "Valid Type" + Fore.RESET)
             break
-        print(
-            Fore.RED + "Type entered is invalid, letters and spaces only." + Fore.RESET
-        )
+        elif type == "b":
+            go_to_main_menu()
+        else:
+            print(
+                Fore.RED
+                + "Type entered is invalid, letters and spaces only."
+                + Fore.RESET
+            )
 
     # Gather code from user validate it using re.match with the pattern given
     while True:
@@ -90,6 +101,8 @@ Date of Manufacture:
         if re.match(code_pattern, code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
+        elif code == "b":
+            go_to_main_menu()
         else:
             print(
                 Fore.RED
@@ -104,6 +117,8 @@ Date of Manufacture:
         if re.match(serial_pattern, serial):
             print(Fore.GREEN + "Valid serial format." + Fore.RESET)
             break
+        elif serial_pattern == "b":
+            go_to_main_menu()
         else:
             print(
                 Fore.RED
@@ -117,19 +132,22 @@ Date of Manufacture:
     # Gather first use from user validate it using datetime
     while parsed_date_first_use is None:
         date_first_use = input("Date of first use dd/mm/yyyy:\n")
-        try:
-            parsed_date_first_use = datetime.strptime(date_first_use, "%d/%m/%Y")
-            print(
-                Fore.GREEN
-                + f"Date of first use valid {parsed_date_first_use}"
-                + Fore.RESET
-            )
-        except ValueError:
-            print(
-                Fore.RED
-                + "Invalid date format. Please user the format dd\mm\yyyy."
-                + Fore.RESET
-            )
+        if date_first_use == "b":
+            go_to_main_menu()
+        else:
+            try:
+                parsed_date_first_use = datetime.strptime(date_first_use, "%d/%m/%Y")
+                print(
+                    Fore.GREEN
+                    + f"Date of first use valid {parsed_date_first_use}"
+                    + Fore.RESET
+                )
+            except ValueError:
+                print(
+                    Fore.RED
+                    + "Invalid date format. Please user the format dd\mm\yyyy."
+                    + Fore.RESET
+                )
 
     # set date of manufacture use to None
     parsed_date_manufacture = None
@@ -137,15 +155,18 @@ Date of Manufacture:
     # Gather manufactured date from user validate it using datetime
     while parsed_date_manufacture is None:
         date_of_manufacture = input("Date of manufacture dd/mm/yyyy:\n")
-        try:
-            parsed_date_manufacture = datetime.strptime(date_first_use, "%d/%m/%Y")
-            print(
+        if date_of_manufacture = 'b':
+            go_to_main_menu()
+        else:
+            try:
+                parsed_date_manufacture = datetime.strptime(date_first_use, "%d/%m/%Y")
+                print(
                 Fore.GREEN
                 + f"Date of manufacture valid {parsed_date_manufacture}"
                 + Fore.RESET
             )
-        except ValueError:
-            print(
+            except ValueError:
+                print(
                 Fore.RED
                 + "Invalid date format. Please user the format dd\mm\yyyy."
                 + Fore.RESET
@@ -177,17 +198,20 @@ def quarantine_equipment():
     removed from the in_use sheet
     """
     while True:
-        quarantine_item_code = input("Code:\n").strip()
+        quarantine_item_code = input("Code, Please use the format xxx/111:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, quarantine_item_code):
             print("Valid code Format.")
             break
+        elif code_pattern == 'b':
+            go_to_main_menu()
         else:
             print(
                 Fore.RED
                 + "Code enter is invalid. Please use the format xxx/111"
                 + Fore.GREEN
             )
+
     print(Fore.YELLOW + "Finding Equipment..." + Fore.RESET)
 
     # Find the cell and send it to row number finder
@@ -253,15 +277,22 @@ def repair_equipment():
     """
     print("Caution Item must already be in quarantine for a repair to be made.")
     while True:
-        repair_item_code = input("Code:\n").strip()
+        repair_item_code = input(
+            "Code: xxx/000 (enter 'b' to return the main menu)\n"
+        ).strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, repair_item_code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
-    else:
-        print(
-            Fore.RED + "Code enter is invalid. Please use the format xxx/111" + Fore.RED
-        )
+        elif repair_item_code == "b":
+            go_to_main_menu()
+            break
+        else:
+            print(
+                Fore.RED
+                + "Code enter is invalid. Please use the format xxx/111"
+                + Fore.RED
+            )
 
     # Find the cell and send it to row number finder
     try:
@@ -293,6 +324,7 @@ def repair_equipment():
 
     # remove equipment form quarantine sheet
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
+    go_to_main_menu()
 
 
 def view_sheet():
@@ -328,14 +360,14 @@ def view_sheet():
 
     # get all values form sheet chosen
     all_rows = sheet_selected.get_all_values()
-    print(f"\nContents of '{sheet_selected}':\n")
+    print(f"\nContents of '{sheet_selected}':\n")  # make better
 
     # add each row to all data
     for row in all_rows[1:]:
         table_data.append(row)
 
     # print table to terminal
-    print(tabulate(table_data, headers=headers, tablefmt="simple"))
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
     # start the function again the user can use the back choice to return to main
     view_sheet()
