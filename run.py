@@ -1,5 +1,6 @@
 import re
 import time
+import textwrap
 from datetime import datetime
 import gspread
 from tabulate import tabulate
@@ -362,9 +363,23 @@ def view_sheet():
     all_rows = sheet_selected.get_all_values()
     print(f"\nContents of '{sheet_selected}':\n")  # make better
 
+    max_column_width = {
+        "name": 10,
+        "type": 10,
+        "code": 8,
+        "serial": 8,
+        "date_first_use": 12,
+        "date_of_manufacturing": 12,
+        "issue": 15,
+    }
+
     # add each row to all data
     for row in all_rows[1:]:
-        table_data.append(row)
+        wrapped_row = [
+            "\n".join(textwrap.wrap(cell, width=max_column_width[header]))
+            for cell, header in zip(row, headers)
+        ]
+        table_data.append(wrapped_row)
 
     # print table to terminal
     print(tabulate(table_data, headers=headers, tablefmt="grid"))

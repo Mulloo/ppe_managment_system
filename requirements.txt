@@ -5,3 +5,4 @@ oauthlib==3.2.0
 simple-term-menu==1.6.4
 colorama==0.4.6
 tabulate==0.9.0
+textwrap==3.4.0
