@@ -155,22 +155,22 @@ Date of Manufacture:
     # Gather manufactured date from user validate it using datetime
     while parsed_date_manufacture is None:
         date_of_manufacture = input("Date of manufacture dd/mm/yyyy:\n")
-        if date_of_manufacture = 'b':
+        if date_of_manufacture == "b":
             go_to_main_menu()
         else:
             try:
                 parsed_date_manufacture = datetime.strptime(date_first_use, "%d/%m/%Y")
                 print(
-                Fore.GREEN
-                + f"Date of manufacture valid {parsed_date_manufacture}"
-                + Fore.RESET
-            )
+                    Fore.GREEN
+                    + f"Date of manufacture valid {parsed_date_manufacture}"
+                    + Fore.RESET
+                )
             except ValueError:
                 print(
-                Fore.RED
-                + "Invalid date format. Please user the format dd\mm\yyyy."
-                + Fore.RESET
-            )
+                    Fore.RED
+                    + "Invalid date format. Please user the format dd\mm\yyyy."
+                    + Fore.RESET
+                )
     print(Fore.YELLOW + "Saving Data..." + Fore.RESET)
 
     # set row data using inputs taken from user
@@ -203,7 +203,7 @@ def quarantine_equipment():
         if re.match(code_pattern, quarantine_item_code):
             print("Valid code Format.")
             break
-        elif code_pattern == 'b':
+        elif code_pattern == "b":
             go_to_main_menu()
         else:
             print(
