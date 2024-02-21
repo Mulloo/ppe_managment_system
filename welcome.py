@@ -28,15 +28,16 @@ def welcome_initial_input():
         |___/                                            
         """
     )
+    time.sleep(15)
+    options()
 
 
-time.sleep(1000)
-
-options = [
-    "1: New Equipment Input",
-    "2: Quarantine An Item",
-    "3: Repair Equipment Log",
-    "4: Retire Equipment",
-    "5: Update Equipment",
-    "6: View Sheet",
-]
+def options():
+    options = [
+        "1: New Equipment Input",
+        "2: Quarantine An Item",
+        "3: Repair Equipment Log",
+        "4: Retire Equipment",
+        "5: Update Equipment",
+        "6: View Sheet",
+    ]
