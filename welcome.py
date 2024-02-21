@@ -30,7 +30,7 @@ def welcome_initial_input():
     )
 
 
-time.sleep(3)
+time.sleep(1000)
 
 options = [
     "1: New Equipment Input",
