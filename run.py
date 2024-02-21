@@ -298,7 +298,7 @@ def repair_equipment():
     # Find the cell and send it to row number finder
     try:
         cell_find = SHEET.worksheet("quarantine").find(repair_item_code)
-    except:
+    except TypeError:
         print(Fore.RED + "Item must be quarantined first" + Fore.RESET)
 
     # Find the cell row using row_num_finder function
@@ -445,7 +445,7 @@ def update_equipment():
     # Find the cell of the code given by the user
     try:
         cell_find = sheet_selected.find(update_item_code)
-    except:
+    except TypeError:
         print(Fore.RED + "Item code not found" + Fore.RESET)
         return
 
