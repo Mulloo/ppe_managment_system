@@ -1,6 +1,3 @@
-import time
-
-
 def welcome_initial_input():
     """Welcomes the user and displays the terminal menu options"""
     print(
@@ -28,11 +25,7 @@ def welcome_initial_input():
         |___/                                            
         """
     )
-    time.sleep(15)
-    options()
 
-
-def options():
     options = [
         "1: New Equipment Input",
         "2: Quarantine An Item",
