@@ -26,11 +26,12 @@ def welcome_initial_input():
         """
     )
 
-    options = [
-        "1: New Equipment Input",
-        "2: Quarantine An Item",
-        "3: Repair Equipment Log",
-        "4: Retire Equipment",
-        "5: Update Equipment",
-        "6: View Sheet",
-    ]
+
+options = [
+    "1: New Equipment Input",
+    "2: Quarantine An Item",
+    "3: Repair Equipment Log",
+    "4: Retire Equipment",
+    "5: Update Equipment",
+    "6: View Sheet",
+]
