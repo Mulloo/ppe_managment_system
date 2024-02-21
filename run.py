@@ -464,7 +464,7 @@ def update_equipment():
 
     update_attribute = headers[attribute_index]
     new_value = input(
-        f"Enter new value for {update_attribute}: (Enter 'cancel' to return to main menu) "
+        f"Enter new value for {update_attribute}:\n Please make sure to use the correct format\n (Enter 'cancel' to return to main menu) "
     ).strip()
 
     if new_value == "cancel":
@@ -483,7 +483,7 @@ def retire_equipment():
     from the in_use sheet
     """
     print(
-        Fore.MAGENTA
+        Fore.RED
         + "Equipment can only be retire if it is already placed into quarantine"
         + Fore.RESET
     )
@@ -529,10 +529,8 @@ def retire_equipment():
 
     # get all the data form the the row returned from the row number finder
     retired_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
-    print(f"Please confirm the data {retired_equipment_row}")
-
     user_confirm = input(
-        f"Please confirm the data {retired_equipment_row}enter 'y' to Confirm 'n' to cancel"
+        f"Please confirm the data {retired_equipment_row}\nenter 'y' to Confirm 'n' to cancel"
     ).strip()
     if user_confirm.lower() == "y":
 

@@ -19,6 +19,7 @@ P.P.E Management System is a terminal program to organize safety equipment mostl
 ## Logic template
 
 [Miro FlowChart]("https://miro.com/app/board/uXjVN8ulxCg=/?share_link_id=908951638780")
+![image of Miro workflow](workflow.png)
 
 ## Testing
 
@@ -36,6 +37,10 @@ P.P.E Management System is a terminal program to organize safety equipment mostl
 ### Bugs
 
 ### Validation
+
+![term_menu bug](new_bug.png)
+![spread sheet bug](bug.png)
+![int bug ](<base 10 bug.png>)
 
 ### Lighthouse
 
