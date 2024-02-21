@@ -202,7 +202,7 @@ def quarantine_equipment():
         quarantine_item_code = input("Code, Please use the format xxx/111:\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, quarantine_item_code):
-            print("Valid code Format.")
+            print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
         elif code_pattern == "b":
             go_to_main_menu()
@@ -210,7 +210,7 @@ def quarantine_equipment():
             print(
                 Fore.RED
                 + "Code enter is invalid. Please use the format xxx/111"
-                + Fore.GREEN
+                + Fore.RESET
             )
 
     print(Fore.YELLOW + "Finding Equipment..." + Fore.RESET)
@@ -292,7 +292,7 @@ def repair_equipment():
             print(
                 Fore.RED
                 + "Code enter is invalid. Please use the format xxx/111"
-                + Fore.RED
+                + Fore.RESET
             )
 
     # Find the cell and send it to row number finder
@@ -303,7 +303,7 @@ def repair_equipment():
 
     # Find the cell row using row_num_finder function
     cell_row = row_num_finder(cell_find, repair_item_code)
-    print("Getting equipment data...")
+    print(Fore.YELLOW + "Getting equipment data..." + Fore.RESET)
 
     # Find row data
     repair_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
@@ -317,11 +317,11 @@ def repair_equipment():
     # add job done to the row
     repair_equipment_row.append(job_completed)
     print(repair_equipment_row)
-    print("Logging repair")
+    print(Fore.YELLOW + "Logging repair" + Fore.RESET)
 
     # add row to repair log sheet
     SHEET.worksheet("repair").append_row(repair_equipment_row)
-    print("Repair Logged")
+    print(Fore.YELLOW + "Repair Logged" + Fore.RESET)
 
     # remove equipment form quarantine sheet
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
@@ -364,7 +364,7 @@ def view_sheet():
 
     # get all values form sheet chosen
     all_rows = sheet_selected.get_all_values()
-    print(f"\nContents of '{sheet_selected}':\n")  # make better
+    print(f"\nContents of '{sheet_selected}':\n")
 
     max_column_width = {
         "name": 8,
@@ -439,7 +439,7 @@ def update_equipment():
             print(
                 Fore.RED
                 + "Code enter is invalid. Please use the format xxx/111"
-                + Fore.RED
+                + Fore.RESET
             )
 
     # Find the cell of the code given by the user
@@ -482,7 +482,11 @@ def retire_equipment():
     destruction and then moves it to the retired sheet the row is then removed
     from the in_use sheet
     """
-    print("Equipment can only be retire if it is already placed into quarantine: \n")
+    print(
+        Fore.MAGENTA
+        + "Equipment can only be retire if it is already placed into quarantine"
+        + Fore.RESET
+    )
 
     # gather code form user and validate t user re.match
     while True:
@@ -521,22 +525,30 @@ def retire_equipment():
 
     # find the row number by sending it to the row num finder function
     cell_row = row_num_finder(cell_find, retired_equipment_code)
-    print("Getting equipment data...")
+    print(Fore.YELLOW + "Getting equipment data..." + Fore.RESET)
 
     # get all the data form the the row returned from the row number finder
     retired_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
     print(f"Please confirm the data {retired_equipment_row}")
-    print("Moving equipment to retired")
 
-    # adds the date of destruction to the row
-    retired_equipment_row.append(date_destruction)
+    user_confirm = input(
+        f"Please confirm the data {retired_equipment_row}enter 'y' to Confirm 'n' to cancel"
+    ).strip()
+    if user_confirm.lower() == "y":
 
-    # adds the new retire row data to the retired sheet
-    SHEET.worksheet("retired").append_row(retired_equipment_row)
+        print(Fore.YELLOW + "Moving equipment to retired" + Fore.RESET)
 
-    # removes the row from quarantine sheet
-    SHEET.worksheet("quarantine").delete_rows(int(cell_row))
-    go_to_main_menu()
+        # adds the date of destruction to the row
+        retired_equipment_row.append(date_destruction)
+
+        # adds the new retire row data to the retired sheet
+        SHEET.worksheet("retired").append_row(retired_equipment_row)
+
+        # removes the row from quarantine sheet
+        SHEET.worksheet("quarantine").delete_rows(int(cell_row))
+        go_to_main_menu()
+    else:
+        go_to_main_menu()
 
 
 def row_num_finder(cell_find, equipment_code):
