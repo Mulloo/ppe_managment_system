@@ -301,15 +301,18 @@ def repair_equipment():
     except:
         print(Fore.RED + "Item must be quarantined first" + Fore.RESET)
 
+    # Find the cell row using row_num_finder function
     cell_row = row_num_finder(cell_find, repair_item_code)
     print("Getting equipment data...")
 
     # Find row data
     repair_equipment_row = SHEET.worksheet("quarantine").row_values(int(cell_row))
+
+    # Gather Job done by the user.
     job_completed = input("Please detail the job completed: ")
-    print(repair_equipment_row)
-    print(cell_find)
-    print(cell_row)
+
+    # add equipment back to in_use sheet without job to keep uniform
+    SHEET.worksheet("in_use").append_row(repair_equipment_row[:-2])
 
     # add job done to the row
     repair_equipment_row.append(job_completed)
@@ -319,9 +322,6 @@ def repair_equipment():
     # add row to repair log sheet
     SHEET.worksheet("repair").append_row(repair_equipment_row)
     print("Repair Logged")
-
-    # add equipment back to in_use sheet
-    SHEET.worksheet("in_use").append_row(repair_equipment_row)
 
     # remove equipment form quarantine sheet
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
@@ -334,9 +334,12 @@ def view_sheet():
         "type",
         "code",
         "serial",
-        "date_first_use",
-        "date_of_manufacturing",
+        "first_use",
+        "manufacture_date",
         "issue",
+        "quarantine_date",
+        "destruction_date",
+        "job",
     ]
 
     # set table data to empty array
@@ -364,13 +367,16 @@ def view_sheet():
     print(f"\nContents of '{sheet_selected}':\n")  # make better
 
     max_column_width = {
-        "name": 10,
-        "type": 10,
+        "name": 8,
+        "type": 9,
         "code": 8,
-        "serial": 8,
-        "date_first_use": 12,
-        "date_of_manufacturing": 12,
-        "issue": 15,
+        "serial": 11,
+        "first_use": 12,
+        "manufacture_date": 10,
+        "issue": 10,
+        "quarantine_date": 10,
+        "destruction_date": 10,
+        "job": 8,
     }
 
     # add each row to all data
@@ -389,7 +395,85 @@ def view_sheet():
 
 
 def update_equipment():
-    print()
+    headers = [
+        "name",
+        "type",
+        "code",
+        "serial",
+        "first_use",
+        "manufacture_date",
+        "issue",
+        "quarantine_date",
+        "destruction_date",
+        "job",
+    ]
+
+    # set worksheet titles form sheet dependent on sheet choice
+    worksheet_titles = [sheet.title for sheet in SHEET.worksheets()]
+
+    worksheet_titles.append("Back")
+    terminal_menu = TerminalMenu(
+        worksheet_titles, title="Select the sheet you wish to update: "
+    )
+
+    menu_entry_index = terminal_menu.show()
+    if menu_entry_index == len(worksheet_titles) - 1:
+        print(Fore.YELLOW + "Returning to the previous menu..." + Fore.RESET)
+        time.sleep(3)
+        main()
+    # get sheet from user choice
+    sheet_selected = SHEET.get_worksheet(menu_entry_index)
+
+    # Gather code form user to find equipment for update
+    while True:
+        update_item_code = input(
+            "Code: xxx/000 (enter 'b' to return the main menu)\n"
+        ).strip()
+        code_pattern = r"^[a-z]+/\d+$"
+        if re.match(code_pattern, update_item_code):
+            print(Fore.GREEN + "Valid code Format." + Fore.RESET)
+            break
+        elif update_item_code == "b":
+            return
+        else:
+            print(
+                Fore.RED
+                + "Code enter is invalid. Please use the format xxx/111"
+                + Fore.RED
+            )
+
+    # Find the cell of the code given by the user
+    try:
+        cell_find = sheet_selected.find(update_item_code)
+    except:
+        print(Fore.RED + "Item code not found" + Fore.RESET)
+        return
+
+    # Get all values from the row found
+    update_item_row = sheet_selected.row_values(cell_find.row)
+    print(Fore.YELLOW + "Current Data:" + Fore.RESET)
+
+    # Print data to user for to confirm
+    for header, value in zip(headers, update_item_row):
+        print(f"{Fore.CYAN}{header}: {value}{Fore.RESET}")
+
+    attribute_menu = TerminalMenu(
+        headers, title="Select the attribute you wish to update: "
+    )
+    attribute_index = attribute_menu.show()
+
+    update_attribute = headers[attribute_index]
+    new_value = input(
+        f"Enter new value for {update_attribute}: (Enter 'cancel' to return to main menu) "
+    ).strip()
+
+    if new_value == "cancel":
+        go_to_main_menu()
+
+    # Send data to sheet using row, column+1 and new value
+    sheet_selected.update_cell(cell_find.row, attribute_index + 1, new_value)
+    print(Fore.GREEN + f"{update_attribute} updated successfully." + Fore.RESET)
+    go_to_main_menu()
 
 
 def retire_equipment():
@@ -415,6 +499,7 @@ def retire_equipment():
             )
 
     # gather date of destruction from user and validate it with datetime
+    parsed_date_destruction = None
     while parsed_date_destruction is None:
         date_destruction = input("Date of destruction dd/mm/yyyy:\n")
         try:
@@ -443,14 +528,15 @@ def retire_equipment():
     print(f"Please confirm the data {retired_equipment_row}")
     print("Moving equipment to retired")
 
-    # removes the n/a placeholder with the destruction date
-    retired_equipment_row.replace("n/a", str(parsed_date_destruction))
+    # adds the date of destruction to the row
+    retired_equipment_row.append(date_destruction)
 
     # adds the new retire row data to the retired sheet
     SHEET.worksheet("retired").append_row(retired_equipment_row)
 
     # removes the row from quarantine sheet
     SHEET.worksheet("quarantine").delete_rows(int(cell_row))
+    go_to_main_menu()
 
 
 def row_num_finder(cell_find, equipment_code):
