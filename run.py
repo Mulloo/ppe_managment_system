@@ -199,12 +199,15 @@ def quarantine_equipment():
     and removed from the in_use sheet
     """
     while True:
-        quarantine_item_code = input("Code, Please use the format xxx/111:\n").strip()
+        quarantine_item_code = input(
+            "Code, Please use the format xxx/111:\n(enter 'b' to exit import new)"
+        ).strip()
+
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, quarantine_item_code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
-        elif code_pattern == "b":
+        elif quarantine_item_code == "b":
             go_to_main_menu()
         else:
             print(
@@ -367,16 +370,16 @@ def view_sheet():
     print(f"\nContents of '{sheet_selected}':\n")
 
     max_column_width = {
-        "name": 8,
-        "type": 8,
+        "name": 5,
+        "type": 6,
         "code": 8,
-        "serial": 8,
-        "first_use": 8,
-        "manufacture_date": 8,
-        "issue": 8,
-        "quarantine_date": 8,
-        "destruction_date": 8,
-        "job": 8,
+        "serial": 10,
+        "first_use": 7,
+        "manufacture_date": 7,
+        "issue": 5,
+        "quarantine_date": 5,
+        "destruction_date": 5,
+        "job": 5,
     }
 
     # add each row to all data
@@ -388,7 +391,7 @@ def view_sheet():
         table_data.append(wrapped_row)
 
     # print table to terminal
-    print(tabulate(table_data, headers=headers, tablefmt="grid"))
+    print(tabulate(table_data, headers=headers, tablefmt="simple"))
 
     # back to start
     go_to_main_menu()
