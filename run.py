@@ -493,9 +493,7 @@ def retire_equipment():
 
     # gather code form user and validate t user re.match
     while True:
-        retired_equipment_code = input(
-            "Code: (enter 'b' to exit)\n (No other return past this point)"
-        ).strip()
+        retired_equipment_code = input("Code: (enter 'b' to exit)\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, retired_equipment_code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
