@@ -36,11 +36,11 @@ P.P.E Management System is a terminal program to organize safety equipment mostl
 
 ### Bugs
 
-### Validation
-
 ![term_menu bug](new_bug.png)
 ![spread sheet bug](bug.png)
 ![int bug ](<base 10 bug.png>)
+
+### Validation
 
 ### Lighthouse
 
