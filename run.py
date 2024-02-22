@@ -67,12 +67,12 @@ Date of Manufacture:
 
     # Gather name of equipment and validate it only has letters and spaces
     while True:
-        name = input("Name:\n").strip()
-        if all(x.isalpha() or x.isspace() for x in name) and name:
+        name = input("Name: (Enter 'b' to exit import new)\n").strip()
+        if name == "b":
+            go_to_main_menu()
+        elif all(x.isalpha() or x.isspace() for x in name) and name:
             print(Fore.GREEN + "Valid Name Format" + Fore.RESET)
             break
-        elif name == "b":
-            go_to_main_menu()
         else:
             print(
                 Fore.RED
@@ -82,12 +82,12 @@ Date of Manufacture:
 
     # Gather equipment type and insure it only has letters and spaces
     while True:
-        type = input("Type:\n").strip()
-        if all(x.isalpha() or x.isspace() for x in type) and type:
+        type = input("Type: (Enter 'b' to exit import new)\n").strip()
+        if type == "b":
+            go_to_main_menu()
+        elif all(x.isalpha() or x.isspace() for x in type) and type:
             print(Fore.GREEN + "Valid Type" + Fore.RESET)
             break
-        elif type == "b":
-            go_to_main_menu()
         else:
             print(
                 Fore.RED
@@ -97,7 +97,7 @@ Date of Manufacture:
 
     # Gather code from user validate it using re.match with the pattern given
     while True:
-        code = input("Code:\n").strip()
+        code = input("Code: (enter 'b' to exit import new)\n").strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
@@ -113,17 +113,17 @@ Date of Manufacture:
 
     # Gather serial from user validate it using re.match with the pattern given
     while True:
-        serial = input("Serial:\n ").strip()
+        serial = input("Serial: (enter 'b' to exit import new)\n ").strip()
         serial_pattern = r"^\d{5}[A-Z]{2}\d{4}$"
         if re.match(serial_pattern, serial):
             print(Fore.GREEN + "Valid serial format." + Fore.RESET)
             break
-        elif serial_pattern == "b":
+        elif serial == "b":
             go_to_main_menu()
         else:
             print(
                 Fore.RED
-                + "Serial number entered is invalid. Please use petzl's serial format ie:22041OI0000"
+                + "Serial number entered is invalid. Please use petzl's serial \n format ie:22041OI0000"
                 + Fore.RESET
             )
 
@@ -195,8 +195,8 @@ def quarantine_equipment():
     """
     Gathers the code of quarantined equipment finds the cell and then
     finds and retrieves the row of information the user inputs the equipments
-    issue and appends it to the row it is then added to the quarantine sheet and
-    removed from the in_use sheet
+    issue and appends it to the row it is then added to the quarantine sheet
+    and removed from the in_use sheet
     """
     while True:
         quarantine_item_code = input("Code, Please use the format xxx/111:\n").strip()
@@ -273,10 +273,10 @@ Data move to sheet successful.  {Fore.RESET} """
 
 def repair_equipment():
     """
-    Gathers the unique code form the user gets the cell then row data takes that
-    data adds the job completed and logs it in the repair sheet
+    Gathers the unique code form the user gets the cell then row data
+    takes that data adds the job completed and logs it in the repair sheet
     """
-    print("Caution Item must already be in quarantine for a repair to be made.")
+    print("Caution Item must already be in quarantine \n for a repair to be made.")
     while True:
         repair_item_code = input(
             "Code: xxx/000 (enter 'b' to return the main menu)\n"
@@ -368,14 +368,14 @@ def view_sheet():
 
     max_column_width = {
         "name": 8,
-        "type": 9,
+        "type": 8,
         "code": 8,
-        "serial": 11,
-        "first_use": 12,
-        "manufacture_date": 10,
-        "issue": 10,
-        "quarantine_date": 10,
-        "destruction_date": 10,
+        "serial": 8,
+        "first_use": 8,
+        "manufacture_date": 8,
+        "issue": 8,
+        "quarantine_date": 8,
+        "destruction_date": 8,
         "job": 8,
     }
 
@@ -390,8 +390,8 @@ def view_sheet():
     # print table to terminal
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
-    # start the function again the user can use the back choice to return to main
-    view_sheet()
+    # back to start
+    go_to_main_menu()
 
 
 def update_equipment():
