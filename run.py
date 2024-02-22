@@ -200,7 +200,7 @@ def quarantine_equipment():
     """
     while True:
         quarantine_item_code = input(
-            "Code, Please use the format xxx/111:\n(enter 'b' to exit import new)"
+            "Code, Please use the format xxx/111:\n(enter 'b' to exit)"
         ).strip()
 
         code_pattern = r"^[a-z]+/\d+$"
@@ -493,14 +493,18 @@ def retire_equipment():
 
     # gather code form user and validate t user re.match
     while True:
-        retired_equipment_code = input("Code:\n").strip()
+        retired_equipment_code = input(
+            "Code: (enter 'b' to exit)\n (No other return past this point)"
+        ).strip()
         code_pattern = r"^[a-z]+/\d+$"
         if re.match(code_pattern, retired_equipment_code):
             print(Fore.GREEN + "Valid code Format." + Fore.RESET)
             break
+        elif retired_equipment_code == "b":
+            go_to_main_menu()
         else:
             print(
-                Fore.GREEN
+                Fore.RED
                 + "Code enter is invalid. Please use the format xxx/111 (x = [a-z])"
                 + Fore.RESET
             )
